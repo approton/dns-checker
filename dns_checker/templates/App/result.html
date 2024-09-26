@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Results</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #1b263b; /* Dark networking blue */
+            color: #fff;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #2d3e50; /* Slightly lighter blue for container */
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #76c7c0; /* Cyan-green color */
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin-top: 40px;
+            font-size: 1.6rem;
+        }
+
+        .info-card {
+            background-color: #3b4a60; /* Grayish-blue for cards */
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #4d5b6b;
+        }
+
+        .ssl-issuer-card {
+            background-color: #4b6a88; /* Softer blue-gray for SSL issuer cards */
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #4d5b6b;
+            color: #fff;
+        }
+
+        .issuer-field {
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+
+        .issuer-field strong {
+            color: #76c7c0; /* Highlight for labels */
+        }
+
+        .issue-card {
+            background-color: #e9ecef; /* Light gray background for issues */
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #ced4da;
+            color: #333;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        a.button {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #3498db; /* Bright blue for button */
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1rem;
+        }
+
+        a.button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Domain Check Results</h1>
+        
+        <h2>DNS Information</h2>
+        <div class="info-card">
+            <p><strong>IP Address(es):</strong></p>
+            <ul>
+                {% if ip_addresses %}
+                    {% for ip in ip_addresses %}
+                        <li>{{ ip }}</li>
+                    {% endfor %}
+                {% else %}
+                    <li>No IP addresses found.</li>
+                {% endif %}
+            </ul>
+        </div>
+
+        <h2>SSL Certificate Information</h2>
+        <div class="info-card">
+            {% if ssl_details.error %}
+                <p><strong>Error:</strong> {{ ssl_details.error }}</p>
+            {% else %}
+                <div class="ssl-issuer-card">
+                    <p class="issuer-field"><strong>Country:</strong> {{ ssl_details.issuer.countryName }}</p>
+                    <p class="issuer-field"><strong>Organization:</strong> {{ ssl_details.issuer.organizationName }}</p>
+                    <p class="issuer-field"><strong>Common Name:</strong> {{ ssl_details.issuer.commonName }}</p>
+                </div>
+                <p><strong>Valid From:</strong> {{ ssl_details.notBefore }}</p>
+                <p><strong>Valid Until:</strong> {{ ssl_details.notAfter }}</p>
+                <p><strong>Is Valid:</strong> {{ ssl_details.is_valid|yesno:"Yes,No" }}</p>
+            {% endif %}
+        </div>
+
+        {% if response_issues %}
+        <h2>Response Issues</h2>
+        <div class="issue-card">
+            {% for key, value in response_issues.items %}
+                <p><strong>{{ key }}:</strong> {{ value }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <a href="{% url 'index' %}" class="button">Check Another Domain</a>
+    </div>
+</body>
+</html>
